@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PowerSense AI — Energy Consumption Demand Intelligence</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- Top Navigation Header -->
+  <header class="app-header">
+    <div class="header-container">
+      <div class="brand">
+        <div class="brand-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <h1>PowerSense AI</h1>
+          <span class="brand-tag">Big Data Energy Prediction &bull; Random Forest Model (95.18% Acc)</span>
+        </div>
+      </div>
+
+      <div class="system-status">
+        <span class="status-dot"></span>
+        <span class="status-label">Model Pipeline Active</span>
+        <span class="badge">1.048M Rows</span>
+        <span class="badge badge-accent">13 Features</span>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <nav class="nav-tabs">
+      <div class="nav-container">
+        <button class="nav-btn active" data-tab="tab-predictor">
+          <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+          Live Demand Predictor
+        </button>
+        <button class="nav-btn" data-tab="tab-benchmarks">
+          <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+          Model Benchmarks & ROC
+        </button>
+        <button class="nav-btn" data-tab="tab-xai">
+          <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+          Explainable AI (SHAP & Permutation)
+        </button>
+        <button class="nav-btn" data-tab="tab-bigdata">
+          <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+          Pandas vs PySpark
+        </button>
+        <button class="nav-btn" data-tab="tab-eda">
+          <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+          Dataset & EDA Insights
+        </button>
+        <button class="nav-btn" data-tab="tab-about">
+          <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          Project Report & Architecture
+        </button>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Main Content Area -->
+  <main class="main-content">
+
+    <!-- ==================== TAB 1: LIVE DEMAND PREDICTOR ==================== -->
+    <section id="tab-predictor" class="tab-pane active">
+      <div class="predictor-layout">
+        
+        <!-- Left Column: Input Form & Presets -->
+        <div class="controls-panel card">
+          <div class="panel-header">
+            <div>
+              <h2>Measurement & Historical Telemetry Inputs</h2>
+              <p class="subtitle">Tune real-time power metrics or choose a real-world scenario preset</p>
+            </div>
+            <button id="btn-reset" class="btn-secondary" title="Reset all inputs to baseline defaults">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+              Reset
+            </button>
+          </div>
+
+          <!-- Quick Presets -->
+          <div class="preset-section">
+            <label class="section-label">Quick Scenario Presets</label>
+            <div class="preset-grid">
+              <button class="preset-chip active" data-preset="night_standby">
+                <span class="chip-title">🌙 Late Night Standby</span>
+                <span class="chip-expected">Expected: Low</span>
+              </button>
+              <button class="preset-chip" data-preset="daytime_moderate">
+                <span class="chip-title">☀️ Daytime Routine</span>
+                <span class="chip-expected">Expected: Medium</span>
+              </button>
+              <button class="preset-chip" data-preset="morning_cooking">
+                <span class="chip-title">🍳 Morning Kitchen Surge</span>
+                <span class="chip-expected">Expected: High</span>
+              </button>
+              <button class="preset-chip" data-preset="evening_peak_heavy">
+                <span class="chip-title">⚡ Evening Peak (AC + Water)</span>
+                <span class="chip-expected">Expected: High</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Historical Test Cases Dropdown -->
+          <div class="historical-section">
+            <div class="history-header">
+              <label for="select-test-case" class="section-label">Or Load Real Historical Row from UCI Dataset</label>
+              <span id="case-truth-badge" class="badge">Truth: —</span>
+            </div>
+            <select id="select-test-case" class="form-select">
+              <option value="">-- Select a historical sample row --</option>
+            </select>
+          </div>
+
+          <hr class="divider">
+
+          <!-- Sliders Grid -->
+          <div class="sliders-container">
+            
+            <!-- Category: Primary Power Readings -->
+            <div class="slider-group-title">
+              <span class="category-icon">⚡</span>
+              <span>Primary Power Telemetry</span>
+            </div>
+
+            <div class="slider-item">
+              <div class="slider-meta">
+                <label for="in-gap">Global Active Power</label>
+                <span class="slider-val"><strong id="val-gap">1.10</strong> <span class="unit">kW</span></span>
+              </div>
+              <input type="range" id="in-gap" min="0.0" max="11.5" step="0.05" value="1.10">
+              <div class="range-labels"><span>0.0 kW (Idle)</span><span>11.5 kW (Peak Load)</span></div>
+            </div>
+
+            <div class="slider-item">
+              <div class="slider-meta">
+                <label for="in-gi">Global Intensity</label>
+                <span class="slider-val"><strong id="val-gi">4.80</strong> <span class="unit">Amps</span></span>
+              </div>
+              <input type="range" id="in-gi" min="0.0" max="50.0" step="0.2" value="4.80">
+              <div class="range-labels"><span>0.0 A</span><span>50.0 A</span></div>
+            </div>
+
+            <div class="slider-row-2">
+              <div class="slider-item">
+                <div class="slider-meta">
+                  <label for="in-grp">Global Reactive Power</label>
+                  <span class="slider-val"><strong id="val-grp">0.12</strong> <span class="unit">kW</span></span>
+                </div>
+                <input type="range" id="in-grp" min="0.0" max="1.5" step="0.02" value="0.12">
+              </div>
+
+              <div class="slider-item">
+                <div class="slider-meta">
+                  <label for="in-volt">Line Voltage</label>
+                  <span class="slider-val"><strong id="val-volt">240.0</strong> <span class="unit">V</span></span>
+                </div>
+                <input type="range" id="in-volt" min="220.0" max="255.0" step="0.5" value="240.0">
+              </div>
+            </div>
+
+            <!-- Category: Sub-metering Rooms -->
+            <div class="slider-group-title">
+              <span class="category-icon">🏠</span>
+              <span>Sub-Metered Household Zones</span>
+            </div>
+
+            <div class="slider-row-3">
+              <div class="slider-item">
+                <div class="slider-meta">
+                  <label for="in-s1">Kitchen (Sub 1)</label>
+                  <span class="slider-val"><strong id="val-s1">0</strong> <span class="unit">Wh</span></span>
+                </div>
+                <input type="range" id="in-s1" min="0" max="45" step="1" value="0">
+              </div>
+              <div class="slider-item">
+                <div class="slider-meta">
+                  <label for="in-s2">Laundry / AC (Sub 2)</label>
+                  <span class="slider-val"><strong id="val-s2">1</strong> <span class="unit">Wh</span></span>
+                </div>
+                <input type="range" id="in-s2" min="0" max="45" step="1" value="1">
+              </div>
+              <div class="slider-item">
+                <div class="slider-meta">
+                  <label for="in-s3">Water Heater (Sub 3)</label>
+                  <span class="slider-val"><strong id="val-s3">0</strong> <span class="unit">Wh</span></span>
+                </div>
+                <input type="range" id="in-s3" min="0" max="45" step="1" value="0">
+              </div>
+            </div>
+
+            <!-- Category: Time and Temporal Lags -->
+            <div class="slider-group-title">
+              <span class="category-icon">⏳</span>
+              <span>Temporal Features & Lags</span>
+              <label class="auto-sync-check">
+                <input type="checkbox" id="check-auto-lags" checked> Auto-sync lags with active power
+              </label>
+            </div>
+
+            <div class="slider-row-3">
+              <div class="slider-item">
+                <div class="slider-meta">
+                  <label for="in-lag1">Lag 1 min ago</label>
+                  <span class="slider-val"><strong id="val-lag1">1.10</strong> <span class="unit">kW</span></span>
+                </div>
+                <input type="range" id="in-lag1" min="0.0" max="11.5" step="0.05" value="1.10">
+              </div>
+              <div class="slider-item">
+                <div class="slider-meta">
+                  <label for="in-lag5">Lag 5 min ago</label>
+                  <span class="slider-val"><strong id="val-lag5">1.10</strong> <span class="unit">kW</span></span>
+                </div>
+                <input type="range" id="in-lag5" min="0.0" max="11.5" step="0.05" value="1.10">
+              </div>
+              <div class="slider-item">
+                <div class="slider-meta">
+                  <label for="in-lag15">Lag 15 min ago</label>
+                  <span class="slider-val"><strong id="val-lag15">1.10</strong> <span class="unit">kW</span></span>
+                </div>
+                <input type="range" id="in-lag15" min="0.0" max="11.5" step="0.05" value="1.10">
+              </div>
+            </div>
+
+            <div class="slider-row-3">
+              <div class="slider-item">
+                <div class="slider-meta">
+                  <label for="in-mean15">15-min Mean</label>
+                  <span class="slider-val"><strong id="val-mean15">1.10</strong> <span class="unit">kW</span></span>
+                </div>
+                <input type="range" id="in-mean15" min="0.0" max="11.5" step="0.05" value="1.10">
+              </div>
+
+              <div class="slider-item">
+                <div class="slider-meta">
+                  <label for="in-hour">Hour of Day</label>
+                  <span class="slider-val"><strong id="val-hour">14</strong> <span class="unit">:00</span></span>
+                </div>
+                <input type="range" id="in-hour" min="0" max="23" step="1" value="14">
+              </div>
+
+              <div class="slider-item">
+                <div class="slider-meta">
+                  <label for="in-dow">Day of Week</label>
+                  <span class="slider-val"><strong id="val-dow">Tuesday</strong></span>
+                </div>
+                <select id="in-dow" class="form-select-sm">
+                  <option value="0">Monday</option>
+                  <option value="1" selected>Tuesday</option>
+                  <option value="2">Wednesday</option>
+                  <option value="3">Thursday</option>
+                  <option value="4">Friday</option>
+                  <option value="5">Saturday</option>
+                  <option value="6">Sunday</option>
+                </select>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- Right Column: Real-Time Prediction Dashboard -->
+        <div class="results-panel">
+          
+          <!-- Primary Prediction Card -->
+          <div class="card prediction-card" id="prediction-card">
+            <div class="card-glow"></div>
+            
+            <div class="pred-header">
+              <span class="pred-label-small">1-Minute Ahead Target Horizon</span>
+              <span class="pred-model-badge">Random Forest Ensemble</span>
+            </div>
+
+            <div class="pred-main">
+              <div class="pred-icon-box" id="pred-icon-box">
+                <svg id="pred-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"></svg>
+              </div>
+              <div class="pred-text-box">
+                <div class="pred-demand-title">PREDICTED DEMAND</div>
+                <div class="pred-level" id="pred-level-display">MEDIUM DEMAND</div>
+                <div class="pred-range-caption" id="pred-range-caption">Expected Power: 0.336 kW – 1.402 kW</div>
+              </div>
+            </div>
+
+            <!-- Animated Probability Bars -->
+            <div class="prob-section">
+              <div class="prob-header">
+                <span>Class Confidence Distribution</span>
+                <span class="confidence-val" id="confidence-val">87.4% Confidence</span>
+              </div>
+
+              <div class="prob-bar-group">
+                <div class="prob-item">
+                  <div class="prob-meta">
+                    <span class="class-tag tag-low">Low (&le;0.336 kW)</span>
+                    <span id="prob-low-val">8.2%</span>
+                  </div>
+                  <div class="bar-track">
+                    <div class="bar-fill fill-low" id="bar-low" style="width: 8.2%;"></div>
+                  </div>
+                </div>
+
+                <div class="prob-item">
+                  <div class="prob-meta">
+                    <span class="class-tag tag-medium">Medium (0.336 - 1.402 kW)</span>
+                    <span id="prob-med-val">84.5%</span>
+                  </div>
+                  <div class="bar-track">
+                    <div class="bar-fill fill-medium" id="bar-med" style="width: 84.5%;"></div>
+                  </div>
+                </div>
+
+                <div class="prob-item">
+                  <div class="prob-meta">
+                    <span class="class-tag tag-high">High (&gt;1.402 kW)</span>
+                    <span id="prob-high-val">7.3%</span>
+                  </div>
+                  <div class="bar-track">
+                    <div class="bar-fill fill-high" id="bar-high" style="width: 7.3%;"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Grid Action Recommendation -->
+            <div class="action-recommendation" id="action-box">
+              <div class="action-icon">💡</div>
+              <div class="action-content">
+                <strong>Grid & Household Recommendation:</strong>
+                <p id="action-text">Standard operational state. Optimal window for baseline household consumption and EV standard trickle charging.</p>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Feature Impact / XAI Explainer Card -->
+          <div class="card xai-impact-card">
+            <div class="panel-header">
+              <div>
+                <h3>Real-Time Feature Impact</h3>
+                <p class="subtitle">Estimated directional contribution to this prediction</p>
+              </div>
+              <span class="badge">SHAP Weighted</span>
+            </div>
+
+            <div class="impact-list" id="impact-list">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+
+          <!-- Dataset Threshold Reference Card -->
+          <div class="card threshold-card">
+            <h3>Class Partitioning Thresholds</h3>
+            <p class="subtitle">Derived from 730,721 training timestamps using 33.3% and 66.7% empirical quantiles</p>
+            <div class="threshold-grid">
+              <div class="threshold-pill low">
+                <div class="t-title">Low Demand</div>
+                <div class="t-val">&le; 0.336 kW</div>
+                <div class="t-sub">Base load / night hours</div>
+              </div>
+              <div class="threshold-pill medium">
+                <div class="t-title">Medium Demand</div>
+                <div class="t-val">0.336 – 1.402 kW</div>
+                <div class="t-sub">Normal daytime activity</div>
+              </div>
+              <div class="threshold-pill high">
+                <div class="t-title">High Demand</div>
+                <div class="t-val">&gt; 1.402 kW</div>
+                <div class="t-sub">Heavy appliances / peak load</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==================== TAB 2: BENCHMARKS & EVALUATION ==================== -->
+    <section id="tab-benchmarks" class="tab-pane">
+      <div class="section-title-bar">
+        <div>
+          <h2>Model Evaluation & Benchmark Showdown</h2>
+          <p class="subtitle">Evaluated on 156,584 unseen testing rows using standardized Scikit-learn pipelines with SimpleImputer & StandardScaler</p>
+        </div>
+        <div class="benchmark-summary-pills">
+          <span class="pill-metric highlight">Best: Random Forest (95.18%)</span>
+          <span class="pill-metric">Test Size: 156,584 Rows</span>
+        </div>
+      </div>
+
+      <!-- Test Metrics Table -->
+      <div class="card table-card">
+        <div class="card-header-flex">
+          <h3>Test Performance Comparison (Full 156,584 Test Set)</h3>
+          <span class="badge badge-accent">Ranked by Macro F1</span>
+        </div>
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Rank</th>
+                <th>Model Architecture</th>
+                <th>Accuracy</th>
+                <th>Balanced Accuracy</th>
+                <th>Macro Precision</th>
+                <th>Macro Recall</th>
+                <th>Macro F1 Score</th>
+                <th>Training Time</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="winner-row">
+                <td><span class="rank-badge gold">1</span></td>
+                <td><strong>Random Forest Classifier</strong></td>
+                <td><strong>95.18%</strong></td>
+                <td>95.30%</td>
+                <td>95.24%</td>
+                <td>95.30%</td>
+                <td><strong>95.27%</strong></td>
+                <td>114.48s</td>
+                <td><span class="badge badge-success">Selected Best</span></td>
+              </tr>
+              <tr>
+                <td><span class="rank-badge silver">2</span></td>
+                <td>Extra Trees Classifier</td>
+                <td>95.14%</td>
+                <td>95.23%</td>
+                <td>95.22%</td>
+                <td>95.23%</td>
+                <td>95.23%</td>
+                <td>38.68s</td>
+                <td><span class="badge">Runner Up</span></td>
+              </tr>
+              <tr>
+                <td><span class="rank-badge bronze">3</span></td>
+                <td>HistGradientBoosting</td>
+                <td>94.92%</td>
+                <td>95.02%</td>
+                <td>95.02%</td>
+                <td>95.02%</td>
+                <td>95.02%</td>
+                <td>27.83s</td>
+                <td><span class="badge">High Speed</span></td>
+              </tr>
+              <tr>
+                <td><span class="rank-badge">4</span></td>
+                <td>Decision Tree (Max Depth 12)</td>
+                <td>93.41%</td>
+                <td>93.58%</td>
+                <td>93.55%</td>
+                <td>93.58%</td>
+                <td>93.55%</td>
+                <td>12.12s</td>
+                <td><span class="badge">Fastest Tree</span></td>
+              </tr>
+              <tr>
+                <td><span class="rank-badge">5</span></td>
+                <td>Logistic Regression (Balanced)</td>
+                <td>89.97%</td>
+                <td>90.11%</td>
+                <td>90.07%</td>
+                <td>90.11%</td>
+                <td>89.95%</td>
+                <td>45.95s</td>
+                <td><span class="badge">Linear Baseline</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Plots Grid: Zoomed Comparison & Confusion Matrices -->
+      <div class="grid-2-col">
+        
+        <div class="card">
+          <div class="card-header-flex">
+            <h3>Detailed Metric Comparison (Zoomed 0.85 - 0.96)</h3>
+            <span class="badge">Seaborn / Matplotlib</span>
+          </div>
+          <p class="subtitle">Focuses on subtle performance differentials between tree ensembles and linear models</p>
+          <div class="plot-frame">
+            <img src="plots/09_model_test_zoomed_comparison.png" alt="Model Test Zoomed Comparison" class="responsive-plot">
+          </div>
+        </div>
+
+        <!-- Interactive Confusion Matrix Viewer -->
+        <div class="card">
+          <div class="card-header-flex">
+            <h3>Model Confusion Matrix</h3>
+            <div class="model-select-wrapper">
+              <select id="select-cm-model" class="form-select-sm">
+                <option value="cm_random_forest.png" selected>Random Forest (Best)</option>
+                <option value="cm_histgradientboosting.png">HistGradientBoosting</option>
+                <option value="cm_extra_trees.png">Extra Trees</option>
+                <option value="cm_decision_tree.png">Decision Tree</option>
+                <option value="cm_logistic_regression.png">Logistic Regression</option>
+              </select>
+            </div>
+          </div>
+          <p class="subtitle">Multi-class classification breakdowns across Low, Medium, and High demand states</p>
+          <div class="plot-frame">
+            <img id="cm-image-display" src="plots/cm_random_forest.png" alt="Confusion Matrix" class="responsive-plot">
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Multi-class ROC Curve -->
+      <div class="card">
+        <div class="card-header-flex">
+          <div>
+            <h3>One-vs-Rest ROC Curve & AUC Analysis — Random Forest</h3>
+            <p class="subtitle">Evaluates True Positive Rate vs False Positive Rate for each individual demand level</p>
+          </div>
+          <div class="auc-tags">
+            <span class="badge badge-accent">Low AUC = 0.9942</span>
+            <span class="badge badge-accent">Medium AUC = 0.9718</span>
+            <span class="badge badge-accent">High AUC = 0.9950</span>
+          </div>
+        </div>
+        <div class="plot-frame large">
+          <img src="plots/11_random_forest_roc_curve.png" alt="ROC Curve Random Forest" class="responsive-plot center">
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ==================== TAB 3: EXPLAINABLE AI ==================== -->
+    <section id="tab-xai" class="tab-pane">
+      <div class="section-title-bar">
+        <div>
+          <h2>Explainable AI (XAI) Suite</h2>
+          <p class="subtitle">Three complementary interpretability methods: Gini Impurity Importance, Permutation Importance, and Tree SHAP</p>
+        </div>
+        <span class="badge badge-accent">Trust & Transparency</span>
+      </div>
+
+      <div class="grid-2-col">
+        
+        <!-- Random Forest Gini Feature Importance -->
+        <div class="card">
+          <div class="card-header-flex">
+            <h3>Random Forest Gini Feature Importance</h3>
+            <span class="badge">In-tree Impurity</span>
+          </div>
+          <p class="subtitle">Calculates the mean decrease in node impurity across all 50 bagged decision trees</p>
+          <div class="plot-frame">
+            <img src="plots/04_random_forest_feature_importance.png" alt="Random Forest Feature Importance" class="responsive-plot">
+          </div>
+          <div class="insight-box">
+            <strong>Key Finding:</strong> <code>Global_active_power</code> (0.280), <code>power_lag_1</code> (0.223), and <code>Global_intensity</code> (0.202) comprise over 70% of total decision weight, confirming strong auto-regressive momentum in minute-by-minute energy usage.
+          </div>
+        </div>
+
+        <!-- Permutation Feature Importance -->
+        <div class="card">
+          <div class="card-header-flex">
+            <h3>Permutation Feature Importance (Validation Set)</h3>
+            <span class="badge">Out-of-Bag Shuffle</span>
+          </div>
+          <p class="subtitle">Measures reduction in Macro F1 score when each feature is randomly shuffled (5 repeats with error bars)</p>
+          <div class="plot-frame">
+            <img src="plots/05_permutation_importance.png" alt="Permutation Feature Importance" class="responsive-plot">
+          </div>
+          <div class="insight-box">
+            <strong>Key Finding:</strong> Permuting <code>Global_active_power</code> causes a severe 0.525 drop in Macro F1, proving it is irreplaceable for model generalization, while voltage and day-of-week show minimal standalone degradation.
+          </div>
+        </div>
+
+      </div>
+
+      <!-- SHAP Summary Plot -->
+      <div class="card">
+        <div class="card-header-flex">
+          <div>
+            <h3>SHAP (SHapley Additive exPlanations) — High Demand Class</h3>
+            <p class="subtitle">Game-theoretic contribution of features driving predictions toward the High Demand regime</p>
+          </div>
+          <span class="badge badge-accent">TreeExplainer (500 Samples)</span>
+        </div>
+        <div class="plot-frame large">
+          <img src="plots/06_shap_summary_high_consumption.png" alt="SHAP Summary Plot" class="responsive-plot center">
+        </div>
+        <div class="insight-grid">
+          <div class="insight-card">
+            <h4>🔴 High Active Power & Intensity</h4>
+            <p>Elevated active power and amperage push the model strongly toward the High Demand class (+SHAP values).</p>
+          </div>
+          <div class="insight-card">
+            <h4>🔵 Temporal Lags & Smoothing</h4>
+            <p>Sustained high values across <code>power_lag_1</code> and <code>power_mean_15</code> confirm persistence of peak loads rather than brief measurement spikes.</p>
+          </div>
+          <div class="insight-card">
+            <h4>🟢 Sub-Meter 3 (Water Heater)</h4>
+            <p>Water heating activates in long continuous cycles, serving as a reliable structural indicator of high residential draw.</p>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ==================== TAB 4: BIG DATA SHOWDOWN ==================== -->
+    <section id="tab-bigdata" class="tab-pane">
+      <div class="section-title-bar">
+        <div>
+          <h2>Big Data Analytics Framework Showdown</h2>
+          <p class="subtitle">Benchmarking aggregation performance across 1,044,506 rows: In-Memory Pandas vs Distributed PySpark</p>
+        </div>
+        <span class="badge badge-accent">Scalability Analysis</span>
+      </div>
+
+      <div class="grid-2-col">
+        
+        <div class="card">
+          <div class="card-header-flex">
+            <h3>Execution Time Showdown (Logarithmic Scale)</h3>
+            <span class="badge badge-accent">Aggregations (1.044M Rows)</span>
+          </div>
+          <p class="subtitle">Elapsed seconds for descriptive statistics (count, mean, std, min, max) over numeric streams</p>
+          <div class="plot-frame">
+            <img src="plots/07_pandas_vs_pyspark_explanatory.png" alt="Pandas vs PySpark Benchmark" class="responsive-plot">
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Architectural Performance Breakdown</h3>
+          <p class="subtitle">Why Pandas significantly outperformed local PySpark on this dataset size</p>
+          
+          <div class="benchmark-stats">
+            <div class="stat-box pandas">
+              <div class="stat-name">Pandas Execution</div>
+              <div class="stat-number">0.1500 s</div>
+              <div class="stat-desc">Zero-copy C-optimized vectorization</div>
+            </div>
+            <div class="stat-box spark">
+              <div class="stat-name">PySpark Execution</div>
+              <div class="stat-number">10.6124 s</div>
+              <div class="stat-desc">JVM initialization & Py4J IPC serialization</div>
+            </div>
+          </div>
+
+          <div class="architecture-notes">
+            <h4>Critical Engineering Takeaways (from Project Report Section 7.10):</h4>
+            <ul>
+              <li><strong>JVM & IPC Overhead:</strong> PySpark launches a JVM session and coordinates Python workers over Py4J sockets. For single-machine datasets that comfortably fit into RAM (&lt; 2 GB), this coordination overhead dwarfs the actual computation.</li>
+              <li><strong>In-Memory Efficiency:</strong> Pandas operates directly in contiguous memory using compiled NumPy C/Cython loops, completing the full aggregation in 150 milliseconds.</li>
+              <li><strong>When to Scale to Spark:</strong> When datasets grow beyond single-node physical RAM (&gt; 100 GB or streaming live telemetry across thousands of homes), PySpark's partitioned RDDs and distributed cluster nodes become essential.</li>
+            </ul>
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- ==================== TAB 5: EDA & DATASET INSIGHTS ==================== -->
+    <section id="tab-eda" class="tab-pane">
+      <div class="section-title-bar">
+        <div>
+          <h2>Exploratory Data Analysis (EDA) & Telemetry Insights</h2>
+          <p class="subtitle">Data cleaning, minute-interval inspection, outage detection, and seasonal power patterns</p>
+        </div>
+        <span class="badge">UCI Individual Household Dataset</span>
+      </div>
+
+      <!-- Dataset KPI Row -->
+      <div class="kpi-row">
+        <div class="kpi-card">
+          <div class="kpi-val">1,048,575</div>
+          <div class="kpi-label">Raw Timestamps Collected</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-val">1,044,506</div>
+          <div class="kpi-label">Cleaned Valid Observations</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-val">2 Years</div>
+          <div class="kpi-label">Timeline (Dec 2006 – Dec 2008)</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-val">1 Minute</div>
+          <div class="kpi-label">Sampling Resolution</div>
+        </div>
+      </div>
+
+      <div class="grid-2-col">
+        
+        <div class="card">
+          <h3>Hourly and Seasonal Power Fluctuations</h3>
+          <p class="subtitle">Microscopic weekly pattern vs macroscopic 2-year monthly averages</p>
+          <div class="plot-frame">
+            <img src="plots/09_hourly_and_seasonal_trends.png" alt="Hourly and Seasonal Trends" class="responsive-plot">
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Sub-Metered Consumption Zones</h3>
+          <p class="subtitle">Average energy share across Kitchen, Laundry/AC, and Water Heater</p>
+          <div class="plot-frame">
+            <img src="plots/10_sub_metering_zones.png" alt="Sub-metering Zones" class="responsive-plot">
+          </div>
+        </div>
+
+      </div>
+
+      <div class="grid-2-col">
+        
+        <div class="card">
+          <h3>Timeline of Data Gaps & Interruptions</h3>
+          <p class="subtitle">Identification of the major 2-day telemetry outage repaired via linear interpolation</p>
+          <div class="plot-frame">
+            <img src="plots/07_data_gaps_timeline.png" alt="Data Gaps Timeline" class="responsive-plot">
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Distribution of Time Intervals (Log Scale)</h3>
+          <p class="subtitle">Proves 99.6% of intervals are exactly 1-minute apart</p>
+          <div class="plot-frame">
+            <img src="plots/08_time_intervals_distribution.png" alt="Time Interval Distribution" class="responsive-plot">
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Voltage Multi-Scale Analysis -->
+      <div class="card">
+        <h3>Multi-Scale Voltage Behavioral Analysis</h3>
+        <p class="subtitle">Visual inspection across full timeline, individual day, single week, and monthly smoothing</p>
+        <div class="voltage-gallery">
+          <div class="v-card">
+            <h4>Single Day (24-Hour Cycle)</h4>
+            <img src="plots/04_voltage_day_trend.png" alt="Day Trend" class="responsive-plot">
+          </div>
+          <div class="v-card">
+            <h4>Single Week (7-Day Fluctuations)</h4>
+            <img src="plots/05_voltage_week_trend.png" alt="Week Trend" class="responsive-plot">
+          </div>
+          <div class="v-card">
+            <h4>Raw Month vs Daily Average</h4>
+            <img src="plots/06_voltage_month_raw_trend.png" alt="Month Trend" class="responsive-plot">
+          </div>
+          <div class="v-card">
+            <h4>Daily Averaged Month Trend</h4>
+            <img src="plots/06b_voltage_month_daily_avg.png" alt="Daily Avg Trend" class="responsive-plot">
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ==================== TAB 6: PROJECT REPORT & ARCHITECTURE ==================== -->
+    <section id="tab-about" class="tab-pane">
+      <div class="section-title-bar">
+        <div>
+          <h2>System Architecture & Engineering Report</h2>
+          <p class="subtitle">End-to-end design specifications extracted from <code>Docs/Energy_Consumption_Prediction_Project_Report_Final.pdf</code></p>
+        </div>
+        <span class="badge badge-accent">Course Project</span>
+      </div>
+
+      <div class="grid-2-col">
+        
+        <div class="card">
+          <h3>Project Overview & Problem Statement</h3>
+          <div class="report-content">
+            <p><strong>Goal:</strong> Forecast future household energy demand levels into 3 operational regimes (Low, Medium, High) 1-minute ahead to empower dynamic smart grid load shedding, peak shaving, and consumer energy budgeting.</p>
+            
+            <h4>Input Feature Specification (13 Features):</h4>
+            <ol>
+              <li><code>Global_active_power</code>: Household global minute-averaged active power (kW)</li>
+              <li><code>Global_reactive_power</code>: Household global minute-averaged reactive power (kW)</li>
+              <li><code>Voltage</code>: Minute-averaged line voltage (V)</li>
+              <li><code>Global_intensity</code>: Minute-averaged current intensity (Amps)</li>
+              <li><code>Sub_metering_1</code>: Kitchen energy consumption (Wh)</li>
+              <li><code>Sub_metering_2</code>: Laundry room & AC consumption (Wh)</li>
+              <li><code>Sub_metering_3</code>: Electric water heater & climate control (Wh)</li>
+              <li><code>power_lag_1</code>: Active power 1 minute ago (kW)</li>
+              <li><code>power_lag_5</code>: Active power 5 minutes ago (kW)</li>
+              <li><code>power_lag_15</code>: Active power 15 minutes ago (kW)</li>
+              <li><code>power_mean_15</code>: Historical 15-minute moving average (kW)</li>
+              <li><code>hour</code>: Hour of the day (0–23)</li>
+              <li><code>day_of_week</code>: Day of the week (0–6, Monday–Sunday)</li>
+            </ol>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>End-to-End Pipeline Architecture</h3>
+          <div class="arch-flow">
+            <div class="flow-step">
+              <div class="step-num">1</div>
+              <div class="step-body">
+                <strong>Data Ingestion & Cleaning:</strong> Parse 1,048,575 rows from <code>household_power_consumption.csv</code>, convert timestamps to index, handle missing values, and repair short gaps via linear interpolation.
+              </div>
+            </div>
+            <div class="flow-step">
+              <div class="step-num">2</div>
+              <div class="step-body">
+                <strong>Feature Engineering:</strong> Construct auto-regressive lags (1, 5, 15 min), rolling statistics, and temporal hour/day cyclical attributes with temporal continuity validation.
+              </div>
+            </div>
+            <div class="flow-step">
+              <div class="step-num">3</div>
+              <div class="step-body">
+                <strong>Quantile Target Discretization:</strong> Partition continuous future target using empirical quantiles (&le; 0.336 kW = Low, 0.336 – 1.402 kW = Medium, &gt; 1.402 kW = High).
+              </div>
+            </div>
+            <div class="flow-step">
+              <div class="step-num">4</div>
+              <div class="step-body">
+                <strong>Model Training & Pipelines:</strong> Standardized Scikit-learn Pipelines with <code>SimpleImputer</code>, <code>StandardScaler</code>, and 5 classifiers evaluated on 70/15/15 chronological split.
+              </div>
+            </div>
+            <div class="flow-step">
+              <div class="step-num">5</div>
+              <div class="step-body">
+                <strong>Explainability (XAI):</strong> Extract Gini Feature Importance, Permutation Importance, and SHAP TreeExplainer values for full auditability.
+              </div>
+            </div>
+            <div class="flow-step">
+              <div class="step-num">6</div>
+              <div class="step-body">
+                <strong>Interactive Frontend Delivery:</strong> Deploy responsive web dashboard with live real-time inference, REST API, and scenario testing.
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Quick Run Instructions Card -->
+      <div class="card run-guide-card">
+        <h3>How to Run the Frontend Applications</h3>
+        <p class="subtitle">Three deployment options are provided in the repository:</p>
+        
+        <div class="options-grid">
+          <div class="option-box">
+            <div class="opt-badge">Default Option</div>
+            <h4>Pure Python Web Server (No External Dependencies)</h4>
+            <p>Serves the full interactive web application and REST API endpoints using Python's standard library:</p>
+            <code>python server.py</code>
+            <p class="opt-desc">Access in your browser at <code>http://localhost:8000</code></p>
+          </div>
+
+          <div class="option-box">
+            <div class="opt-badge">Option A (Streamlit)</div>
+            <h4>Streamlit Application (Pure Python)</h4>
+            <p>The Streamlit app as detailed in notebook Cell 61:</p>
+            <code>pip install streamlit pandas numpy joblib scikit-learn<br>streamlit run app.py</code>
+            <p class="opt-desc">Access in your browser at <code>http://localhost:8501</code></p>
+          </div>
+
+          <div class="option-box">
+            <div class="opt-badge">Option B (FastAPI)</div>
+            <h4>FastAPI Backend (REST API)</h4>
+            <p>The FastAPI backend endpoint as detailed in notebook Cell 63:</p>
+            <code>pip install fastapi uvicorn pydantic<br>python api.py</code>
+            <p class="opt-desc">Swagger documentation at <code>http://localhost:8000/docs</code></p>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <footer class="app-footer">
+    <div class="footer-container">
+      <p>PowerSense AI &bull; Big Data Analytics for Household Energy Consumption Prediction &bull; 2026</p>
+      <p class="footer-sub">Based on research report: <code>Docs/Energy_Consumption_Prediction_Project_Report_Final.pdf</code> and <code>Coding/Final_TRW (1).ipynb</code></p>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
+
